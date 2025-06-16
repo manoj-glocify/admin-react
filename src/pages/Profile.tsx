@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Paper,
@@ -6,41 +6,81 @@ import {
   TextField,
   Button,
   Grid,
+  Alert,
   Avatar,
   Divider,
 } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
+import authService from '../services/auth';
 
 const Profile: React.FC = () => {
+  const [profile, setProfile] = useState<any>(null);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+  });
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchProfileData = async () => {
+    try {
+      const data = await authService.getCurrentUser();
+      if (data) {
+        setFormData({
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+          email: data.email || '',
+        });
+        setProfile(data);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err?.response?.data?.message || 'Failed to fetch profile');
+    }
+  };
+
+
+  useEffect(() => {
+    fetchProfileData();
+  }, []);
+
   return (
+
     <Box sx={{ flexGrow: 1 }}>
       <Typography variant="h4" gutterBottom>
         Profile
       </Typography>
+      {error && (
+        <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
+          {error}
+        </Alert>
+      )}
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, textAlign: 'center' }}>
+          <Paper sx={{ p: 3, textAlign: "center" }}>
             <Avatar
               sx={{
                 width: 120,
                 height: 120,
-                margin: '0 auto 16px',
-                bgcolor: 'primary.main',
+                margin: "0 auto 16px",
+                bgcolor: "primary.main",
               }}
             >
               <AccountCircle sx={{ fontSize: 100 }} />
             </Avatar>
             <Typography variant="h6" gutterBottom>
-              John Doe
+              {profile?.firstName} {profile?.lastName}
             </Typography>
             <Typography color="text.secondary" gutterBottom>
-              Administrator
+              {profile?.role?.name}
             </Typography>
             <Button
               variant="outlined"
               fullWidth
               sx={{ mt: 2 }}
-              onClick={() => {/* Change avatar logic */}}
+              onClick={() => {
+                /* Change avatar logic */
+              }}
             >
               Change Avatar
             </Button>
@@ -56,24 +96,27 @@ const Profile: React.FC = () => {
                 <TextField
                   fullWidth
                   label="First Name"
-                  defaultValue="John"
+                  value={formData?.firstName || 'John'}
                   margin="normal"
+                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="Last Name"
-                  defaultValue="Doe"
+                  value={formData?.lastName || 'Doe'}
                   margin="normal"
+                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
                   label="Email"
-                  defaultValue="john.doe@example.com"
+                  value={formData?.email || 'john.doe@example.com'}
                   margin="normal"
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
               </Grid>
             </Grid>
@@ -107,9 +150,11 @@ const Profile: React.FC = () => {
                 />
               </Grid>
             </Grid>
-            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+            <Box
+              sx={{ mt: 3, display: "flex", justifyContent: "flex-end", gap: 2 }}
+            >
               <Button variant="outlined">Cancel</Button>
-              <Button variant="contained">Save Changes</Button>
+              <Button variant="contained" >Save Changes</Button>
             </Box>
           </Paper>
         </Grid>

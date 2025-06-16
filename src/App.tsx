@@ -31,7 +31,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   if (!authService.isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
-
   return <>{children}</>;
 };
 
@@ -46,23 +45,20 @@ function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <MainLayout>
-                  <Routes>
-                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/users" element={<Users />} />
-                    <Route path="/roles" element={<Roles />} />
-                    <Route path="/permissions" element={<Permissions />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/settings" element={<Settings />} />
-                  </Routes>
-                </MainLayout>
+                <MainLayout />
               </ProtectedRoute>
-            }
-          />
+            }>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/roles" element={<Roles />} />
+            <Route path="/permissions" element={<Permissions />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
         </Routes>
       </Router>
-    </ThemeProvider>
+    </ThemeProvider >
   );
 }
 

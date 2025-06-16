@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -22,6 +22,12 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (authService.isAuthenticated()) {
+      navigate('/dashboard');
+    }
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -31,6 +37,7 @@ const Login: React.FC = () => {
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    // alert();
     event.preventDefault();
     setError(null);
     setLoading(true);
@@ -39,11 +46,13 @@ const Login: React.FC = () => {
       await authService.login(formData);
       navigate('/dashboard');
     } catch (err: any) {
+      console.error(err);
       setError(err.response?.data?.message || 'An error occurred during login');
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <Container component="main" maxWidth="xs">

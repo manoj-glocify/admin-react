@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -17,30 +17,61 @@ import {
   Delete as DeleteIcon,
   Add as AddIcon,
 } from '@mui/icons-material';
-
+import authService from '../services/auth';
 interface User {
-  id: number;
-  name: string;
+  createdAt: string;
   email: string;
-  role: string;
-  status: string;
+  firstName: string;
+  googleId: string | null;
+  id: string;
+  isActive: boolean;
+  lastName: string;
+  roleId: string;
+  updatedAt: string;
 }
 
 const mockUsers: User[] = [
-  { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active' },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Active' },
-  { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Editor', status: 'Inactive' },
+  { createdAt: '', id: "1", firstName: 'John Doe', email: 'john@example.com', googleId: '', lastName: '', roleId: 'Admin', isActive: true, updatedAt: '' },
+  { createdAt: '', id: "2", firstName: 'Jane Smith', email: 'jane@example.com', googleId: '', lastName: '', roleId: 'User', isActive: true, updatedAt: '' },
+  { createdAt: '', id: "3", firstName: 'Bob Johnson', email: 'bob@example.com', googleId: '', lastName: '', roleId: 'Editor', isActive: true, updatedAt: '' },
 ];
 
 const Users: React.FC = () => {
+  const [listusers, setUsers] = React.useState<User[]>(mockUsers);
+  const getUserslist = async () => {
+    try {
+      const data = await authService.getUserlists();
+      console.log(data);
+      if (data && Array.isArray(data)) {
+        setUsers(data);
+      } else {
+        console.warn("User list is empty or invalid:", data);
+        setUsers([]); // Set empty array to avoid breaking the table
+      }
+    } catch {
+      console.log("error");
+    }
+  }
+  useEffect(() => {
+    getUserslist();
+  }, []);
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Typography variant="h4">Users</Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => {/* Add user logic */}}
+          onClick={() => {
+            /* Add user logic */
+          }}
         >
           Add User
         </Button>
@@ -57,22 +88,28 @@ const Users: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {mockUsers.map((user) => (
+            {listusers.map((user) => (
               <TableRow key={user.id}>
-                <TableCell>{user.name}</TableCell>
+                <TableCell>
+                  {user.firstName} {user.lastName}
+                </TableCell>
                 <TableCell>{user.email}</TableCell>
-                <TableCell>{user.role}</TableCell>
-                <TableCell>{user.status}</TableCell>
+                <TableCell>{(user.roleId === "1") ? "Admin" : "User"}</TableCell>
+                <TableCell>{user.isActive ? "Active" : "Inactive"}</TableCell>
                 <TableCell align="right">
                   <IconButton
                     size="small"
-                    onClick={() => {/* Edit user logic */}}
+                    onClick={() => {
+                      /* Edit user logic */
+                    }}
                   >
                     <EditIcon />
                   </IconButton>
                   <IconButton
                     size="small"
-                    onClick={() => {/* Delete user logic */}}
+                    onClick={() => {
+                      /* Delete user logic */
+                    }}
                   >
                     <DeleteIcon />
                   </IconButton>

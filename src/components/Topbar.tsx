@@ -16,6 +16,7 @@ import {
   AccountCircle,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import authService from '../services/auth';
 
 const drawerWidth = 240;
 
@@ -55,8 +56,10 @@ const Topbar: React.FC<TopbarProps> = ({ open, toggleDrawer }) => {
 
   const handleLogout = () => {
     // Add logout logic here
+    authService.logout();
     handleMenuClose();
     navigate('/login');
+    window.location.href = '/login';
   };
 
   return (
