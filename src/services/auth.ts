@@ -162,12 +162,7 @@ const authService = {
   },
 
   isAuthenticated(): boolean {
-    return true;
-    const token = localStorage.getItem(config.auth.tokenKey);
-    const refreshToken = localStorage.getItem(config.auth.refreshTokenKey);
-    console.log("isAuthenticated: token (auth_token) is", token ? "set" : "undefined");
-    console.log("isAuthenticated: refresh_token is", refreshToken ? "set" : "undefined");
-    return !!token;
+    return !!localStorage.getItem(config.auth.tokenKey);
   },
   getRole(): string | null {
     return localStorage.getItem("user_role");

@@ -32,7 +32,7 @@ interface UserData {
     firstName: string;
     lastName: string;
     email: string;
-    roleId: string;
+    // roleId: string;
 }
 
 const EditUser: React.FC = () => {
@@ -41,7 +41,7 @@ const EditUser: React.FC = () => {
         firstName: '',
         lastName: '',
         email: '',
-        roleId: '',
+        // roleId: '',
     });
     const [loading, setLoading] = useState(false);
     const [roles, setRoles] = React.useState<Roles[]>([]);
@@ -81,7 +81,7 @@ const EditUser: React.FC = () => {
                 firstName: response?.firstName ?? '',
                 lastName: response?.lastName ?? '',
                 email: response?.email ?? '',
-                roleId: response?.role?.id ?? '',
+                // roleId: response?.role?.id ?? '',
             });
         };
         fetchUser();
