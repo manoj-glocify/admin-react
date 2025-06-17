@@ -48,7 +48,6 @@ const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({ allowedRoles, c
   if (!userRole || !allowedRoles.includes(userRole)) {
     return <Navigate to="/profile" replace />;
   }
-
   return <>{children}</>;
 };
 
