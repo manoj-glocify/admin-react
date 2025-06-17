@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Grid,
+  Alert,
   Paper,
   Typography,
   Box,
@@ -56,6 +57,11 @@ const Dashboard: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         Dashboard
       </Typography>
+      {error && (
+        <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
+          {error}
+        </Alert>
+      )}
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard

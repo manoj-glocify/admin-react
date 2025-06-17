@@ -26,7 +26,7 @@ const Login: React.FC = () => {
     if (authService.isAuthenticated()) {
       navigate('/dashboard');
     }
-  }, []);
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

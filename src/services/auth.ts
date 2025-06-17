@@ -13,6 +13,14 @@ interface RegisterData {
   password: string;
   confirmPassword: string;
 }
+interface NewUserData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  roleId: string;
+}
 
 interface AuthResponse {
   token: string;
@@ -22,20 +30,24 @@ interface AuthResponse {
     firstName: string;
     lastName: string;
     email: string;
-    role: string;
+    role: {
+      name: string;
+    };
   };
 }
 
 const authService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>("/auth/login", credentials);
-    // console.log(response.data);
-    const {token, refreshToken} = response.data;
-    // console.log(response);
-    // console.log("config", config);
-    // Store tokens in localStorage
+    const {token, refreshToken, user} = response.data;
+
+    const role = user?.role?.name;
+
     localStorage.setItem(config.auth.tokenKey, token);
     localStorage.setItem(config.auth.refreshTokenKey, refreshToken);
+    if (role) {
+      localStorage.setItem(config.auth.role.name, role);
+    }
 
     return response.data;
   },
@@ -58,6 +70,8 @@ const authService = {
       // Clear tokens regardless of API call success
       localStorage.removeItem(config.auth.tokenKey);
       localStorage.removeItem(config.auth.refreshTokenKey);
+      localStorage.removeItem(config.auth.role.name);
+      window.location.href = "/login";
     }
   },
 
@@ -110,15 +124,48 @@ const authService = {
     // const token = localStorage.getItem(config.auth.tokenKey);
     // if (!token) return null;
     try {
-      const response = await api.get("/auth/userlists"); // or whatever your route is
+      const response = await api.get("/user/userlists"); // or whatever your route is
       return response.data.userlists; //
     } catch (error) {
+      return null;
+    }
+  },
+  getRoleslists: async (): Promise<AuthResponse["user"] | null> => {
+    const token = localStorage.getItem(config.auth.tokenKey);
+    if (!token) return null;
+    try {
+      const response = await api.get("/roles"); // or whatever your route is
+      return response.data; //
+    } catch (error) {
+      return null;
+    }
+  },
+
+  async newUser(data: NewUserData): Promise<AuthResponse> {
+    const response = await api.post<AuthResponse>("/user/create", data);
+
+    return response.data;
+  },
+
+  async getUserById(id: string): Promise<AuthResponse["user"] | null> {
+    const token = localStorage.getItem(config.auth.tokenKey);
+    if (!token) return null;
+
+    try {
+      const response = await api.get(`/user/${id}`);
+      console.log("response.data", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch user:", error);
       return null;
     }
   },
 
   isAuthenticated(): boolean {
     return !!localStorage.getItem(config.auth.tokenKey);
+  },
+  getRole(): string | null {
+    return localStorage.getItem("user_role");
   },
 };
 

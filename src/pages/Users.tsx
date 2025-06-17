@@ -18,6 +18,7 @@ import {
   Add as AddIcon,
 } from '@mui/icons-material';
 import authService from '../services/auth';
+import { useNavigate } from 'react-router-dom';
 interface User {
   createdAt: string;
   email: string;
@@ -37,6 +38,7 @@ const mockUsers: User[] = [
 ];
 
 const Users: React.FC = () => {
+  const navigate = useNavigate();
   const [listusers, setUsers] = React.useState<User[]>(mockUsers);
   const getUserslist = async () => {
     try {
@@ -71,6 +73,7 @@ const Users: React.FC = () => {
           startIcon={<AddIcon />}
           onClick={() => {
             /* Add user logic */
+            navigate('/users/add');
           }}
         >
           Add User
@@ -101,6 +104,7 @@ const Users: React.FC = () => {
                     size="small"
                     onClick={() => {
                       /* Edit user logic */
+                      navigate(`/users/edit/${user.id}`);
                     }}
                   >
                     <EditIcon />
