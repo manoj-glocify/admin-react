@@ -20,7 +20,38 @@ const Profile: React.FC = () => {
     lastName: '',
     email: '',
   });
+  const [passwordData, setPasswordData] = useState({
+    currentpwd: '',
+    newpwd: '',
+    confirmpwd: '',
+  });
   const [error, setError] = useState<string | null>(null);
+
+  const changePwd = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    console.log(name);
+    setPasswordData((prev) => ({
+      ...prev,
+      [name as string]: value,
+    }));
+    if (name !== 'currentpwd') {
+      if (!validateForm()) {
+        setError('');
+        return;
+      }
+    }
+  }
+  const validateForm = (): boolean => {
+    if (passwordData.newpwd !== passwordData.confirmpwd) {
+      setError('Passwords do not match');
+      return false;
+    }
+    if (passwordData.newpwd.length < 8) {
+      setError('Password must be at least 8 characters long');
+      return false;
+    }
+    return true;
+  };
 
   const fetchProfileData = async () => {
     try {
@@ -38,12 +69,15 @@ const Profile: React.FC = () => {
       setError(err?.response?.data?.message || 'Failed to fetch profile');
     }
   };
+  const handleSubmit = () => {
+    console.log('formData>', formData);
+  }
 
 
   useEffect(() => {
     fetchProfileData();
   }, []);
-
+  console.log('passwordData', passwordData);
   return (
 
     <Box sx={{ flexGrow: 1 }}>
@@ -130,7 +164,9 @@ const Profile: React.FC = () => {
                   fullWidth
                   label="Current Password"
                   type="password"
+                  name="currentpwd"
                   margin="normal"
+                  onChange={changePwd}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -138,7 +174,9 @@ const Profile: React.FC = () => {
                   fullWidth
                   label="New Password"
                   type="password"
+                  name="newpwd"
                   margin="normal"
+                  onChange={changePwd}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -146,7 +184,9 @@ const Profile: React.FC = () => {
                   fullWidth
                   label="Confirm New Password"
                   type="password"
+                  name="confirmpwd"
                   margin="normal"
+                  onChange={changePwd}
                 />
               </Grid>
             </Grid>
@@ -154,7 +194,7 @@ const Profile: React.FC = () => {
               sx={{ mt: 3, display: "flex", justifyContent: "flex-end", gap: 2 }}
             >
               <Button variant="outlined">Cancel</Button>
-              <Button variant="contained" >Save Changes</Button>
+              <Button variant="contained" onClick={handleSubmit}>Save Changes</Button>
             </Box>
           </Paper>
         </Grid>

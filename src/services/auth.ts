@@ -21,6 +21,13 @@ interface NewUserData {
   confirmPassword: string;
   roleId: string;
 }
+interface UserData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  roleId: string;
+  isActive: boolean;
+}
 
 interface AuthResponse {
   token: string;
@@ -34,6 +41,7 @@ interface AuthResponse {
       name: string;
     };
   };
+  message: string;
 }
 
 const authService = {
@@ -48,13 +56,12 @@ const authService = {
     if (role) {
       localStorage.setItem(config.auth.role.name, role);
     }
-
     return response.data;
   },
 
   async register(data: RegisterData): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>("/auth/register", data);
-    const {token, refreshToken, user} = response.data;
+    const {token, refreshToken} = response.data;
 
     // Store tokens in localStorage
     localStorage.setItem(config.auth.tokenKey, token);
@@ -147,7 +154,7 @@ const authService = {
     return response.data;
   },
 
-  async getUserById(id: string): Promise<AuthResponse["user"] | null> {
+  async getUserById(id: string): Promise<UserData | null> {
     const token = localStorage.getItem(config.auth.tokenKey);
     if (!token) return null;
 
@@ -158,6 +165,32 @@ const authService = {
     } catch (error) {
       console.error("Failed to fetch user:", error);
       return null;
+    }
+  },
+  async updateUserById(id: string, data: UserData): Promise<AuthResponse> {
+    const token = localStorage.getItem(config.auth.tokenKey);
+    if (!token) throw new Error("Authentication token missing");
+
+    try {
+      const response = await api.put(`/user/update/${id}`, data);
+      console.log("response.data", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch user:", error);
+      throw error;
+    }
+  },
+  async deleteUserById(id: string): Promise<AuthResponse> {
+    const token = localStorage.getItem(config.auth.tokenKey);
+    if (!token) throw new Error("Authentication token missing");
+
+    try {
+      const response = await api.delete(`/user/delete/${id}`);
+      console.log("response.data", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch user:", error);
+      throw error;
     }
   },
 

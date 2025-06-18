@@ -11,6 +11,9 @@ import {
   Typography,
   IconButton,
   Button,
+  Snackbar,
+  Alert,
+  SnackbarCloseReason,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -19,6 +22,7 @@ import {
 } from '@mui/icons-material';
 import authService from '../services/auth';
 import { useNavigate } from 'react-router-dom';
+import { useConfirm } from "material-ui-confirm";
 interface User {
   createdAt: string;
   email: string;
@@ -29,21 +33,65 @@ interface User {
   lastName: string;
   roleId: string;
   updatedAt: string;
+  role: {
+    name: string;
+  }
 }
 
 const mockUsers: User[] = [
-  { createdAt: '', id: "1", firstName: 'John Doe', email: 'john@example.com', googleId: '', lastName: '', roleId: 'Admin', isActive: true, updatedAt: '' },
-  { createdAt: '', id: "2", firstName: 'Jane Smith', email: 'jane@example.com', googleId: '', lastName: '', roleId: 'User', isActive: true, updatedAt: '' },
-  { createdAt: '', id: "3", firstName: 'Bob Johnson', email: 'bob@example.com', googleId: '', lastName: '', roleId: 'Editor', isActive: true, updatedAt: '' },
+  {
+    createdAt: '',
+    id: "1",
+    firstName: 'John Doe',
+    email: 'john@example.com',
+    googleId: '',
+    lastName: '',
+    roleId: 'Admin',
+    isActive: true,
+    updatedAt: '',
+    role: {
+      name: 'Admin',
+    },
+  },
+  {
+    createdAt: '',
+    id: "2",
+    firstName: 'Jane Smith',
+    email: 'jane@example.com',
+    googleId: '',
+    lastName: '',
+    roleId: 'User',
+    isActive: true,
+    updatedAt: '',
+    role: {
+      name: 'User',
+    },
+  },
+  {
+    createdAt: '',
+    id: "3",
+    firstName: 'Bob Johnson',
+    email: 'bob@example.com',
+    googleId: '',
+    lastName: '',
+    roleId: 'Editor',
+    isActive: true,
+    updatedAt: '',
+    role: {
+      name: 'User',
+    }
+  },
 ];
 
 const Users: React.FC = () => {
   const navigate = useNavigate();
   const [listusers, setUsers] = React.useState<User[]>(mockUsers);
+  const [open, setOpen] = React.useState(false);
+  const confirm = useConfirm();
   const getUserslist = async () => {
     try {
       const data = await authService.getUserlists();
-      console.log(data);
+      // console.log(data);
       if (data && Array.isArray(data)) {
         setUsers(data);
       } else {
@@ -54,9 +102,36 @@ const Users: React.FC = () => {
       console.log("error");
     }
   }
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: SnackbarCloseReason,
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+  const deleteUser = async (userId: string) => {
+    const { confirmed, reason } = await confirm({
+      description: "Are you sure you want to delete this user?",
+    });
+
+    if (!confirmed) return;
+    console.log(reason);
+    try {
+      await authService.deleteUserById(userId); // Replace with your actual delete call
+      setOpen(true);
+      getUserslist();
+    } catch (error) {
+      console.error("Failed to delete user", error);
+      alert("Failed to delete user. Please try again.");
+    }
+  };
   useEffect(() => {
     getUserslist();
   }, []);
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box
@@ -73,7 +148,7 @@ const Users: React.FC = () => {
           startIcon={<AddIcon />}
           onClick={() => {
             /* Add user logic */
-            navigate('/users/add');
+            navigate("/users/add");
           }}
         >
           Add User
@@ -97,7 +172,10 @@ const Users: React.FC = () => {
                   {user.firstName} {user.lastName}
                 </TableCell>
                 <TableCell>{user.email}</TableCell>
-                <TableCell>{(user.roleId === "1") ? "Admin" : "User"}</TableCell>
+                <TableCell>
+                  {user.role.name.charAt(0).toUpperCase() +
+                    user.role.name.slice(1)}
+                </TableCell>
                 <TableCell>{user.isActive ? "Active" : "Inactive"}</TableCell>
                 <TableCell align="right">
                   <IconButton
@@ -109,12 +187,7 @@ const Users: React.FC = () => {
                   >
                     <EditIcon />
                   </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      /* Delete user logic */
-                    }}
-                  >
+                  <IconButton size="small" onClick={() => deleteUser(user.id)}>
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>
@@ -123,6 +196,17 @@ const Users: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <Snackbar
+        open={open}
+        autoHideDuration={2000}
+      >
+        <Alert
+          onClose={handleClose}
+          severity="success"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >user deleted successfully</Alert>
+      </Snackbar>
     </Box>
   );
 };

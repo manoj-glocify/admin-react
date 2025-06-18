@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
+import { ConfirmProvider } from "material-ui-confirm";
 import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
@@ -54,6 +55,7 @@ const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({ allowedRoles, c
 function App() {
   return (
     <ThemeProvider theme={theme}>
+      <ConfirmProvider>
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -88,6 +90,7 @@ function App() {
           </Route> */}
         </Routes>
       </Router>
+      </ConfirmProvider>
     </ThemeProvider >
   );
 }
