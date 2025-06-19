@@ -13,6 +13,10 @@ interface RegisterData {
   password: string;
   confirmPassword: string;
 }
+interface PasswordData {
+  currentPassword: string;
+  newPassword: string;
+}
 interface NewUserData {
   firstName: string;
   lastName: string;
@@ -43,7 +47,11 @@ interface AuthResponse {
   };
   message: string;
 }
-
+interface profileInfoUpdate {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
 const authService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>("/auth/login", credentials);
@@ -193,7 +201,27 @@ const authService = {
       throw error;
     }
   },
+  async updateProfile(data: profileInfoUpdate): Promise<AuthResponse> {
+    const token = localStorage.getItem(config.auth.tokenKey);
+    if (!token) throw new Error("Authentication token missing");
 
+    try {
+      const response = await api.put(`/profile/`, data);
+      console.log("response.data", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch user:", error);
+      throw error;
+    }
+  },
+  async changePassword(data: PasswordData): Promise<AuthResponse> {
+    const response = await api.post<AuthResponse>(
+      "/profile/change-password",
+      data
+    );
+
+    return response.data;
+  },
   isAuthenticated(): boolean {
     return !!localStorage.getItem(config.auth.tokenKey);
   },

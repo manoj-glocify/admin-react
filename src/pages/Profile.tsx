@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Box,
   Paper,
@@ -14,6 +14,7 @@ import { AccountCircle } from '@mui/icons-material';
 import authService from '../services/auth';
 
 const Profile: React.FC = () => {
+
   const [profile, setProfile] = useState<any>(null);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -21,11 +22,14 @@ const Profile: React.FC = () => {
     email: '',
   });
   const [passwordData, setPasswordData] = useState({
-    currentpwd: '',
-    newpwd: '',
+    currentPassword: '',
+    newPassword: '',
     confirmpwd: '',
   });
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const changePwd = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -34,7 +38,7 @@ const Profile: React.FC = () => {
       ...prev,
       [name as string]: value,
     }));
-    if (name !== 'currentpwd') {
+    if (name !== 'currentPassword') {
       if (!validateForm()) {
         setError('');
         return;
@@ -42,11 +46,11 @@ const Profile: React.FC = () => {
     }
   }
   const validateForm = (): boolean => {
-    if (passwordData.newpwd !== passwordData.confirmpwd) {
+    if (passwordData.newPassword !== passwordData.confirmpwd) {
       setError('Passwords do not match');
       return false;
     }
-    if (passwordData.newpwd.length < 8) {
+    if (passwordData.newPassword.length < 8) {
       setError('Password must be at least 8 characters long');
       return false;
     }
@@ -69,15 +73,42 @@ const Profile: React.FC = () => {
       setError(err?.response?.data?.message || 'Failed to fetch profile');
     }
   };
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log('formData>', formData);
+    try {
+      const response = await authService.updateProfile(formData);
+      setSuccess(response.message);
+    } catch (err: any) {
+      console.error(err);
+      setError(err?.response?.data?.message || 'Failed to update profile');
+    }
+    if (passwordData?.confirmpwd !== '' && passwordData?.currentPassword !== '' && passwordData?.newPassword !== '') {
+      console.log('passwordData>', passwordData);
+      try {
+        const response = await authService.changePassword(passwordData);
+        setSuccess(response.message);
+      } catch (err: any) {
+        console.error(err);
+        setError(err?.response?.data?.message || 'Failed to update profile');
+      }
+    }
   }
+  const handleButtonClick = () => {
+    if (fileInputRef.current != null) {
+      fileInputRef.current.click();
+    }
+  };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setSelectedFile(event.target.files[0]);
+    }
+  }
 
   useEffect(() => {
     fetchProfileData();
   }, []);
-  console.log('passwordData', passwordData);
+  console.log('selectedFile', selectedFile);
   return (
 
     <Box sx={{ flexGrow: 1 }}>
@@ -89,6 +120,12 @@ const Profile: React.FC = () => {
           {error}
         </Alert>
       )}
+      {success && (
+        <Alert severity="success" sx={{ mt: 2, width: '100%' }}>
+          {success}
+        </Alert>
+      )}
+
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
           <Paper sx={{ p: 3, textAlign: "center" }}>
@@ -108,13 +145,18 @@ const Profile: React.FC = () => {
             <Typography color="text.secondary" gutterBottom>
               {profile?.role?.name}
             </Typography>
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
             <Button
               variant="outlined"
               fullWidth
               sx={{ mt: 2 }}
-              onClick={() => {
-                /* Change avatar logic */
-              }}
+              onClick={handleButtonClick}
             >
               Change Avatar
             </Button>
@@ -164,7 +206,7 @@ const Profile: React.FC = () => {
                   fullWidth
                   label="Current Password"
                   type="password"
-                  name="currentpwd"
+                  name="currentPassword"
                   margin="normal"
                   onChange={changePwd}
                 />
@@ -174,7 +216,7 @@ const Profile: React.FC = () => {
                   fullWidth
                   label="New Password"
                   type="password"
-                  name="newpwd"
+                  name="newPassword"
                   margin="normal"
                   onChange={changePwd}
                 />
