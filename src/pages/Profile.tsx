@@ -9,6 +9,7 @@ import {
   Alert,
   Avatar,
   Divider,
+  CircularProgress,
 } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
 import authService from '../services/auth';
@@ -20,6 +21,7 @@ const Profile: React.FC = () => {
     firstName: '',
     lastName: '',
     email: '',
+    avartar: '',
   });
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -30,6 +32,7 @@ const Profile: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const changePwd = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -60,12 +63,15 @@ const Profile: React.FC = () => {
   const fetchProfileData = async () => {
     try {
       const data = await authService.getCurrentUser();
+      console.log('data', data)
       if (data) {
         setFormData({
           firstName: data.firstName || '',
           lastName: data.lastName || '',
           email: data.email || '',
+          avartar: data.avartar,
         });
+
         setProfile(data);
       }
     } catch (err: any) {
@@ -99,16 +105,28 @@ const Profile: React.FC = () => {
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      setSelectedFile(event.target.files[0]);
+      const file = event.target.files[0];
+      setSelectedFile(file);
+      setLoading(true);
+      try {
+        const response = await authService.updateProfilePic(file);
+        console.log('Upload successful:', response);
+      } catch (error) {
+        console.error('Upload failed:', error);
+      } finally {
+        setLoading(false);
+      }
     }
-  }
+  };
+
+
 
   useEffect(() => {
     fetchProfileData();
   }, []);
-  console.log('selectedFile', selectedFile);
+  // console.log('selectedFile', selectedFile);
   return (
 
     <Box sx={{ flexGrow: 1 }}>
@@ -129,7 +147,30 @@ const Profile: React.FC = () => {
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
           <Paper sx={{ p: 3, textAlign: "center" }}>
-            <Avatar
+            {loading ? <CircularProgress size={24} /> :
+              (selectedFile &&
+                <Avatar alt="Profile" sx={{
+                  width: 120,
+                  height: 120,
+                  margin: "0 auto 16px",
+                  bgcolor: "primary.main",
+                }} src={URL.createObjectURL(selectedFile)} />
+              ) || (profile?.avartar == null ? <Avatar
+                sx={{
+                  width: 120,
+                  height: 120,
+                  margin: "0 auto 16px",
+                  bgcolor: "primary.main",
+                }}
+              >
+                <AccountCircle sx={{ fontSize: 100 }} />
+              </Avatar> : <Avatar alt="Profile" sx={{
+                width: 120,
+                height: 120,
+                margin: "0 auto 16px",
+                bgcolor: "primary.main",
+              }} src={profile?.avartar} />)}
+            {/* <Avatar
               sx={{
                 width: 120,
                 height: 120,
@@ -138,7 +179,7 @@ const Profile: React.FC = () => {
               }}
             >
               <AccountCircle sx={{ fontSize: 100 }} />
-            </Avatar>
+            </Avatar> */}
             <Typography variant="h6" gutterBottom>
               {profile?.firstName} {profile?.lastName}
             </Typography>

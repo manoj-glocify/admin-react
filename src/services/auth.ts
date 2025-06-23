@@ -25,6 +25,13 @@ interface NewUserData {
   confirmPassword: string;
   roleId: string;
 }
+interface ProfileData {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  avartar: string;
+}
 interface UserData {
   firstName: string;
   lastName: string;
@@ -102,7 +109,7 @@ const authService = {
     return response.data;
   },
 
-  async getCurrentUser(): Promise<AuthResponse["user"] | null> {
+  async getCurrentUser(): Promise<ProfileData | null> {
     const token = localStorage.getItem(config.auth.tokenKey);
     if (!token) return null;
 
@@ -221,6 +228,24 @@ const authService = {
     );
 
     return response.data;
+  },
+  async updateProfilePic(file: File): Promise<AuthResponse> {
+    const token = localStorage.getItem(config.auth.tokenKey);
+    if (!token) throw new Error("Authentication token missing");
+    const formData = new FormData();
+    formData.append("image", file);
+    try {
+      const response = await api.put(`/profile/update-pic`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("response.data", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to update profile picture:", error);
+      throw error;
+    }
   },
   isAuthenticated(): boolean {
     return !!localStorage.getItem(config.auth.tokenKey);

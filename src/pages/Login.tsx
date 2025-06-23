@@ -46,8 +46,8 @@ const Login: React.FC = () => {
       await authService.login(formData);
       navigate('/dashboard');
     } catch (err: any) {
-      console.error(err);
-      setError(err.response?.data?.message || 'An error occurred during login');
+      console.log('err', err);
+      setError(err.response?.data?.message || 'An error occurred during login please check username or password');
     } finally {
       setLoading(false);
     }
