@@ -162,6 +162,16 @@ const authService = {
       return null;
     }
   },
+  getAllRoleslists: async (): Promise<AuthResponse["user"] | null> => {
+    const token = localStorage.getItem(config.auth.tokenKey);
+    if (!token) return null;
+    try {
+      const response = await api.get("/roles/"); // or whatever your route is
+      return response.data; //
+    } catch (error) {
+      return null;
+    }
+  },
 
   async newUser(data: NewUserData): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>("/user/create", data);

@@ -62,12 +62,10 @@ const mockPermissions: Permission[] = [
 ];
 
 const PermissionCard: React.FC<{ permission: Permission }> = ({ permission }) => {
-  const [checked, setChecked] = React.useState(true);
+  const [checked, setChecked] = React.useState(permission.enabled);
   const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('>>>');
+    // console.log('>>>');
     setChecked(e.target.checked);
-    // Toggle permission logic
-    // e.permission.enabled = false;
   };
   return (
     <Paper
@@ -91,12 +89,12 @@ const PermissionCard: React.FC<{ permission: Permission }> = ({ permission }) =>
         <FormControlLabel
           control={
             <Switch
-              checked={checked ?? permission.enabled}
+              checked={checked}
               onChange={handleToggle}
               color="primary"
             />
           }
-          label={checked ? 'Enabled' : 'Disabled'}
+          label={(checked) ? 'Enabled' : 'Disabled'}
         />
       </Box>
     </Paper>
