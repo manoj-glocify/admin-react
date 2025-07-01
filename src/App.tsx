@@ -52,6 +52,13 @@ const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({ allowedRoles, c
   return <>{children}</>;
 };
 
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  if (!authService.isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
+};
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
@@ -63,19 +70,26 @@ function App() {
           <Route
             path="/"
             element={
-              <RoleProtectedRoute allowedRoles={['admin', 'user']}>
+              authService.isAuthenticated()
+                ? <Navigate to="/dashboard" replace />
+                : <Navigate to="/login" replace />
+            }
+          />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
                 <MainLayout />
-              </RoleProtectedRoute>
+              </ProtectedRoute>
             }>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/users/add" element={<AddUser />} />
-            <Route path="/users/edit/:id" element={<EditUser />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/roles" element={<Roles />} />
-            <Route path="/permissions" element={<Permissions />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="users/add" element={<AddUser />} />
+            <Route path="users/edit/:id" element={<EditUser />} />
+            <Route path="users" element={<Users />} />
+            <Route path="roles" element={<Roles />} />
+            <Route path="permissions" element={<Permissions />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
           {/* <Route
             path="/"

@@ -258,7 +258,6 @@ const authService = {
     }
   },
   isAuthenticated(): boolean {
-    return true;
     const token = localStorage.getItem(config.auth.tokenKey);
     const refreshToken = localStorage.getItem(config.auth.refreshTokenKey);
     console.log("isAuthenticated: token (auth_token) is", token ? "set" : "undefined");
