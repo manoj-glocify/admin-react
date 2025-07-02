@@ -16,8 +16,9 @@ import {
   AccountCircle,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import authService from '../services/auth';
 
-const drawerWidth = 240;
+// const drawerWidth = 240;
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   zIndex: theme.zIndex.drawer + 1,
@@ -55,8 +56,9 @@ const Topbar: React.FC<TopbarProps> = ({ open, toggleDrawer }) => {
 
   const handleLogout = () => {
     // Add logout logic here
+    authService.logout();
     handleMenuClose();
-    navigate('/login');
+    // navigate('/login');
   };
 
   return (

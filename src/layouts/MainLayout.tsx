@@ -2,12 +2,14 @@ import React from 'react';
 import { Box, CssBaseline } from '@mui/material';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
+import { Outlet } from 'react-router-dom';
 
-interface MainLayoutProps {
-  children: React.ReactNode;
-}
+// interface MainLayoutProps {
+//   children: React.ReactNode;
+// }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+const MainLayout: React.FC = () => {
+  // console.log('cc>>', children);
   const [open, setOpen] = React.useState(true);
 
   const toggleDrawer = () => {
@@ -15,7 +17,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <Topbar open={open} toggleDrawer={toggleDrawer} />
       <Sidebar open={open} toggleDrawer={toggleDrawer} />
@@ -26,10 +28,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           p: 3,
           mt: 8,
           backgroundColor: (theme) => theme.palette.background.default,
-          minHeight: '100vh',
+          minHeight: "100vh",
         }}
       >
-        {children}
+        {<Outlet />}
       </Box>
     </Box>
   );

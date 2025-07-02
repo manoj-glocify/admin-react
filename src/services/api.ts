@@ -1,10 +1,10 @@
-import axios, { InternalAxiosRequestConfig } from 'axios';
-import config from '../config';
+import axios, {InternalAxiosRequestConfig} from "axios";
+import config from "../config";
 
 const api = axios.create({
   baseURL: `${config.api.url}/${config.api.version}`,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -38,7 +38,7 @@ api.interceptors.response.use(
           refreshToken,
         });
 
-        const { token } = response.data;
+        const {token} = response.data;
         localStorage.setItem(config.auth.tokenKey, token);
 
         if (originalRequest.headers) {
@@ -49,7 +49,7 @@ api.interceptors.response.use(
         // Handle refresh token failure
         localStorage.removeItem(config.auth.tokenKey);
         localStorage.removeItem(config.auth.refreshTokenKey);
-        window.location.href = '/login';
+        //  window.location.href = '/login';
         return Promise.reject(error);
       }
     }
@@ -58,4 +58,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api; 
+export default api;
