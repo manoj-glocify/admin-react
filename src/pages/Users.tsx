@@ -23,6 +23,7 @@ import {
 import authService from '../services/auth';
 import { useNavigate } from 'react-router-dom';
 import { useConfirm } from "material-ui-confirm";
+import { checkPermission } from '../config/utils';
 interface User {
   createdAt: string;
   email: string;
@@ -91,15 +92,13 @@ const Users: React.FC = () => {
   const getUserslist = async () => {
     try {
       const data = await authService.getUserlists();
-      // console.log(data);
       if (data && Array.isArray(data)) {
         setUsers(data);
       } else {
-        console.warn("User list is empty or invalid:", data);
-        setUsers([]); // Set empty array to avoid breaking the table
+        setUsers([]);
       }
     } catch {
-      console.log("error");
+      throw new Error("Failed to fetch users");
     }
   }
   const handleClose = (
@@ -109,23 +108,20 @@ const Users: React.FC = () => {
     if (reason === 'clickaway') {
       return;
     }
-
     setOpen(false);
   };
   const deleteUser = async (userId: string) => {
-    const { confirmed, reason } = await confirm({
+    const { confirmed } = await confirm({
       description: "Are you sure you want to delete this user?",
     });
 
     if (!confirmed) return;
-    console.log(reason);
     try {
-      await authService.deleteUserById(userId); // Replace with your actual delete call
+      await authService.deleteUserById(userId);
       setOpen(true);
       getUserslist();
     } catch (error) {
-      console.error("Failed to delete user", error);
-      alert("Failed to delete user. Please try again.");
+      throw new Error("Failed to delete user");
     }
   };
   useEffect(() => {
@@ -143,16 +139,18 @@ const Users: React.FC = () => {
         }}
       >
         <Typography variant="h4">Users</Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => {
-            /* Add user logic */
-            navigate("/users/add");
-          }}
-        >
-          Add User
-        </Button>
+        {checkPermission("users", "create") &&
+          (<Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => {
+              /* Add user logic */
+              navigate("/users/add");
+            }}
+          >
+            Add User
+          </Button>)
+        }
       </Box>
       <TableContainer component={Paper}>
         <Table>
@@ -162,7 +160,7 @@ const Users: React.FC = () => {
               <TableCell>Email</TableCell>
               <TableCell>Role</TableCell>
               <TableCell>Status</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              {checkPermission("users", "edit") && (<TableCell align="right">Actions</TableCell>)}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -177,20 +175,21 @@ const Users: React.FC = () => {
                     user.role.name.slice(1)}
                 </TableCell>
                 <TableCell>{user.isActive ? "Active" : "Inactive"}</TableCell>
-                <TableCell align="right">
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      /* Edit user logic */
-                      navigate(`/users/edit/${user.id}`);
-                    }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton size="small" onClick={() => deleteUser(user.id)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
+                {checkPermission("users", "edit") && (
+                  <TableCell align="right">
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        /* Edit user logic */
+                        navigate(`/users/edit/${user.id}`);
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton size="small" onClick={() => deleteUser(user.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>)}
               </TableRow>
             ))}
           </TableBody>

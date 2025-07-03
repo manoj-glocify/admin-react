@@ -49,13 +49,10 @@ const Register: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
-
     if (!validateForm()) {
       return;
     }
-
     setLoading(true);
-
     try {
       await authService.register(formData);
       navigate('/dashboard');

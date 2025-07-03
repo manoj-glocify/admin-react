@@ -4,14 +4,9 @@ import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
 import { Outlet } from 'react-router-dom';
 
-// interface MainLayoutProps {
-//   children: React.ReactNode;
-// }
 
 const MainLayout: React.FC = () => {
-  // console.log('cc>>', children);
   const [open, setOpen] = React.useState(true);
-
   const toggleDrawer = () => {
     setOpen(!open);
   };

@@ -13,6 +13,14 @@ import {
   Assessment as AssessmentIcon,
 } from '@mui/icons-material';
 import authService from '../services/auth';
+import { checkPermission } from '../config/utils';
+
+const mainItems = [
+  { title: 'Users', value: "2", icon: <PeopleIcon color="primary" />, module: 'users', action: 'read' },
+  { title: 'Roles', value: "3", icon: <SecurityIcon color="primary" />, module: 'roles', action: 'read' },
+  { title: 'Permissions', value: "0", icon: <SettingsIcon color="primary" />, module: 'permissions', action: 'read' },
+  { title: 'System Status', value: "Healthy", icon: <AssessmentIcon color="primary" />, module: 'system' }
+];
 
 const StatCard = ({ title, value, icon }: { title: string; value: string; icon: React.ReactNode }) => (
   <Paper
@@ -44,14 +52,21 @@ const Dashboard: React.FC = () => {
       const data = await authService.getDashboardData();
       dashboardData(data);
     } catch (err: any) {
-      console.error(err);
       setError(err?.response?.data?.message || 'Failed to fetch profile');
     }
   };
+  const updatedMainItems = mainItems.map((item) => {
+    if (data && item.module) {
+      // Assuming the API returns a structure like { users: 'new_value', roles: 'new_value', etc. }
+      if (item.module in data) {
+        return { ...item, value: data[item.module] };
+      }
+    }
+    return item;
+  });
   useEffect(() => {
     fetchDashboardData();
   }, []);
-  console.log('>>>', data);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Typography variant="h4" gutterBottom>
@@ -63,7 +78,21 @@ const Dashboard: React.FC = () => {
         </Alert>
       )}
       <Grid container spacing={3}>
-        <Grid item xs={12} sm={6} md={3}>
+        {updatedMainItems.map((item) => {
+          if (item.module && item.action && !checkPermission(item.module, item.action)) {
+            return null;
+          }
+          return (
+            <Grid item xs={12} sm={6} md={3} key={item.title}>
+              <StatCard
+                title={item.title}
+                value={data ? data[item.title.replace(' ', '') + 'Count'] || item.value : item.value}
+                icon={item.icon}
+              />
+            </Grid>
+          );
+        })}
+        {/* <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Total Users"
             value={data?.profileCount || 0}
@@ -90,7 +119,7 @@ const Dashboard: React.FC = () => {
             value="Healthy"
             icon={<AssessmentIcon color="primary" />}
           />
-        </Grid>
+        </Grid> */}
       </Grid>
     </Box>
   );

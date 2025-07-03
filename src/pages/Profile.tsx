@@ -21,7 +21,7 @@ const Profile: React.FC = () => {
     firstName: '',
     lastName: '',
     email: '',
-    avartar: '',
+    avatar: '',
   });
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -36,7 +36,6 @@ const Profile: React.FC = () => {
 
   const changePwd = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    console.log(name);
     setPasswordData((prev) => ({
       ...prev,
       [name as string]: value,
@@ -62,39 +61,32 @@ const Profile: React.FC = () => {
 
   const fetchProfileData = async () => {
     try {
-      const data = await authService.getCurrentUser();
-      console.log('data', data)
+      const data = await authService.getCurrentUserinfo();
       if (data) {
         setFormData({
           firstName: data.firstName || '',
           lastName: data.lastName || '',
           email: data.email || '',
-          avartar: data.avartar,
+          avatar: data.avatar,
         });
-
         setProfile(data);
       }
     } catch (err: any) {
-      console.error(err);
       setError(err?.response?.data?.message || 'Failed to fetch profile');
     }
   };
   const handleSubmit = async () => {
-    console.log('formData>', formData);
     try {
       const response = await authService.updateProfile(formData);
       setSuccess(response.message);
     } catch (err: any) {
-      console.error(err);
       setError(err?.response?.data?.message || 'Failed to update profile');
     }
     if (passwordData?.confirmpwd !== '' && passwordData?.currentPassword !== '' && passwordData?.newPassword !== '') {
-      console.log('passwordData>', passwordData);
       try {
         const response = await authService.changePassword(passwordData);
         setSuccess(response.message);
       } catch (err: any) {
-        console.error(err);
         setError(err?.response?.data?.message || 'Failed to update profile');
       }
     }
@@ -111,24 +103,19 @@ const Profile: React.FC = () => {
       setSelectedFile(file);
       setLoading(true);
       try {
-        const response = await authService.updateProfilePic(file);
-        console.log('Upload successful:', response);
-      } catch (error) {
-        console.error('Upload failed:', error);
+        await authService.updateProfilePic(file);
+      } catch (error: any) {
+        setError(error);
       } finally {
         setLoading(false);
       }
     }
   };
 
-
-
   useEffect(() => {
     fetchProfileData();
   }, []);
-  // console.log('selectedFile', selectedFile);
   return (
-
     <Box sx={{ flexGrow: 1 }}>
       <Typography variant="h4" gutterBottom>
         Profile
@@ -155,7 +142,7 @@ const Profile: React.FC = () => {
                   margin: "0 auto 16px",
                   bgcolor: "primary.main",
                 }} src={URL.createObjectURL(selectedFile)} />
-              ) || (profile?.avartar == null ? <Avatar
+              ) || (profile?.avatar == null ? <Avatar
                 sx={{
                   width: 120,
                   height: 120,
@@ -169,17 +156,7 @@ const Profile: React.FC = () => {
                 height: 120,
                 margin: "0 auto 16px",
                 bgcolor: "primary.main",
-              }} src={profile?.avartar} />)}
-            {/* <Avatar
-              sx={{
-                width: 120,
-                height: 120,
-                margin: "0 auto 16px",
-                bgcolor: "primary.main",
-              }}
-            >
-              <AccountCircle sx={{ fontSize: 100 }} />
-            </Avatar> */}
+              }} src={profile?.avatar} />)}
             <Typography variant="h6" gutterBottom>
               {profile?.firstName} {profile?.lastName}
             </Typography>

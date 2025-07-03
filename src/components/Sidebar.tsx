@@ -1,4 +1,5 @@
-import React from 'react';
+import React from "react";
+// import React from "react";
 import {
   Drawer,
   List,
@@ -15,6 +16,7 @@ import {
   Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { checkPermission } from "../config/utils";
 
 const drawerWidth = 240;
 
@@ -37,15 +39,14 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-  { text: 'Users', icon: <PeopleIcon />, path: '/users' },
-  { text: 'Roles', icon: <SecurityIcon />, path: '/roles' },
-  { text: 'Permissions', icon: <SettingsIcon />, path: '/permissions' },
+  { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard', module: 'dashboard' },
+  { text: 'Users', icon: <PeopleIcon />, path: '/users', module: 'users', action: 'read' },
+  { text: 'Roles', icon: <SecurityIcon />, path: '/roles', module: 'roles', action: 'read' },
+  { text: 'Permissions', icon: <SettingsIcon />, path: '/permissions', module: 'permissions', action: 'read' },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   const navigate = useNavigate();
-
   return (
     <StyledDrawer
       variant="permanent"
@@ -59,8 +60,11 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
     >
       <Toolbar />
       <List>
-        {menuItems.map((item) => (
-          <ListItemButton
+        {menuItems.map((item) => {
+          if (item.module && item.action && !checkPermission(item.module, item.action)) {
+            return null;
+          }
+          return (<ListItemButton
             key={item.text}
             onClick={() => navigate(item.path)}
             sx={{
@@ -84,7 +88,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
               sx={{ opacity: open ? 1 : 0 }}
             />
           </ListItemButton>
-        ))}
+          )
+        })}
       </List>
     </StyledDrawer>
   );

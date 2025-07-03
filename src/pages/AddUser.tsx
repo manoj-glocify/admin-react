@@ -34,27 +34,27 @@ const AddUser: React.FC = () => {
   const getRoleslist = async () => {
     try {
       const data = await authService.getRoleslists();
-      console.log(data);
       if (data && Array.isArray(data)) {
         setRoles(data);
+        console.log(data);
         if (data.length > 0) {
-          setSelectedRole(data[0].id);
           setFormData((prev) => ({
             ...prev,
             roleId: data[0].id,
           }));
+          data.forEach((role) => {
+            if (role.isDefault) {
+              setSelectedRole(role.id);
+            }
+          });
         }
-        // setRoles([]);
       } else {
-        console.warn("User list is empty or invalid:", data);
-        setRoles([]); // Set empty array to avoid breaking the table
+        setRoles([]);
       }
     } catch {
-      console.log("error");
+      throw new Error("Failed to fetch roles");
     }
   }
-
-
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -90,14 +90,10 @@ const AddUser: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
-    console.log(formData);
-
     if (!validateForm()) {
       return;
     }
-
     setLoading(true);
-
     try {
       await authService.newUser(formData);
       navigate('/users');
@@ -110,7 +106,6 @@ const AddUser: React.FC = () => {
   useEffect(() => {
     getRoleslist();
   }, []);
-  console.log('roles>', roles);
   return (
     <Container component="main" maxWidth="xl">
       <Typography component="h1" variant="h4">
