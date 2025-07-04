@@ -23,7 +23,7 @@ import {
 import authService from '../services/auth';
 import { useNavigate } from 'react-router-dom';
 import { useConfirm } from "material-ui-confirm";
-import { checkPermission } from '../config/utils';
+import { hasPermission } from '../config/utils';
 interface User {
   createdAt: string;
   email: string;
@@ -139,7 +139,7 @@ const Users: React.FC = () => {
         }}
       >
         <Typography variant="h4">Users</Typography>
-        {checkPermission("users", "create") &&
+        {hasPermission("users", "create") &&
           (<Button
             variant="contained"
             startIcon={<AddIcon />}
@@ -160,7 +160,7 @@ const Users: React.FC = () => {
               <TableCell>Email</TableCell>
               <TableCell>Role</TableCell>
               <TableCell>Status</TableCell>
-              {checkPermission("users", "edit") && (<TableCell align="right">Actions</TableCell>)}
+              {hasPermission("users", "edit") && (<TableCell align="right">Actions</TableCell>)}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -175,7 +175,7 @@ const Users: React.FC = () => {
                     user.role.name.slice(1)}
                 </TableCell>
                 <TableCell>{user.isActive ? "Active" : "Inactive"}</TableCell>
-                {checkPermission("users", "edit") && (
+                {hasPermission("users", "edit") && (
                   <TableCell align="right">
                     <IconButton
                       size="small"

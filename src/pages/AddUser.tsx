@@ -36,15 +36,14 @@ const AddUser: React.FC = () => {
       const data = await authService.getRoleslists();
       if (data && Array.isArray(data)) {
         setRoles(data);
-        console.log(data);
         if (data.length > 0) {
-          setFormData((prev) => ({
-            ...prev,
-            roleId: data[0].id,
-          }));
           data.forEach((role) => {
             if (role.isDefault) {
               setSelectedRole(role.id);
+              setFormData((prev) => ({
+                ...prev,
+                roleId: role.id,
+              }));
             }
           });
         }

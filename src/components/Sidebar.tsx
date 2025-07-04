@@ -16,7 +16,7 @@ import {
   Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { checkPermission } from "../config/utils";
+import { hasPermission } from "../config/utils";
 
 const drawerWidth = 240;
 
@@ -61,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
       <Toolbar />
       <List>
         {menuItems.map((item) => {
-          if (item.module && item.action && !checkPermission(item.module, item.action)) {
+          if (item.module && item.action && !hasPermission(item.module, item.action)) {
             return null;
           }
           return (<ListItemButton

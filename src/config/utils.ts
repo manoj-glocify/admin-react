@@ -1,4 +1,4 @@
-export const checkPermission = (module: string, action: string): boolean => {
+export const hasPermission = (module: string, action: string): boolean => {
   const permissions = localStorage.getItem("user_permission");
   if (!permissions) return false;
   const permissionArray = JSON.parse(permissions || "[]");

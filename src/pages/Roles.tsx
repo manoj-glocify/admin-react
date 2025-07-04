@@ -18,7 +18,7 @@ import {
   Delete as DeleteIcon,
   Add as AddIcon,
 } from '@mui/icons-material';
-import { checkPermission } from '../config/utils';
+import { hasPermission } from '../config/utils';
 import authService from '../services/auth';
 import { useConfirm } from "material-ui-confirm";
 interface Role {
@@ -100,7 +100,7 @@ const Roles: React.FC = () => {
         }}
       >
         <Typography variant="h4">Roles</Typography>
-        {checkPermission("roles", "create") && (
+        {hasPermission("roles", "create") && (
           <Button
             variant="contained"
             startIcon={<AddIcon />}
@@ -119,7 +119,7 @@ const Roles: React.FC = () => {
               <TableCell>Description</TableCell>
               <TableCell>Permissions</TableCell>
               <TableCell>Users</TableCell>
-              {checkPermission("roles", "edit") && (<TableCell align="right">Actions</TableCell>)}
+              {hasPermission("roles", "edit") && (<TableCell align="right">Actions</TableCell>)}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -143,7 +143,7 @@ const Roles: React.FC = () => {
                   </Box>
                 </TableCell>
                 <TableCell>{role.users.length}</TableCell>
-                {checkPermission("roles", "edit") && (<TableCell align="right">
+                {hasPermission("roles", "edit") && (<TableCell align="right">
                   <IconButton
                     size="small"
                     onClick={() => {

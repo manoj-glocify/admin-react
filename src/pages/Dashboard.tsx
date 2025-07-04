@@ -13,7 +13,7 @@ import {
   Assessment as AssessmentIcon,
 } from '@mui/icons-material';
 import authService from '../services/auth';
-import { checkPermission } from '../config/utils';
+import { hasPermission } from '../config/utils';
 
 const mainItems = [
   { title: 'Users', value: "2", icon: <PeopleIcon color="primary" />, module: 'users', action: 'read' },
@@ -79,7 +79,7 @@ const Dashboard: React.FC = () => {
       )}
       <Grid container spacing={3}>
         {updatedMainItems.map((item) => {
-          if (item.module && item.action && !checkPermission(item.module, item.action)) {
+          if (item.module && item.action && !hasPermission(item.module, item.action)) {
             return null;
           }
           return (
@@ -92,35 +92,7 @@ const Dashboard: React.FC = () => {
             </Grid>
           );
         })}
-        {/* <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Total Users"
-            value={data?.profileCount || 0}
-            icon={<PeopleIcon color="primary" />}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Active Roles"
-            value={data?.RolesCount || 0}
-            icon={<SecurityIcon color="primary" />}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Permissions"
-            value={data?.PerMissions || 0}
-            icon={<SettingsIcon color="primary" />}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="System Status"
-            value="Healthy"
-            icon={<AssessmentIcon color="primary" />}
-          />
-        </Grid> */}
-      </Grid>
+              </Grid>
     </Box>
   );
 };
