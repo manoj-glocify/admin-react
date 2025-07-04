@@ -30,7 +30,7 @@ interface ProfileData {
   firstName: string;
   lastName: string;
   email: string;
-  avartar: string;
+  avatar: string;
 }
 interface UserData {
   firstName: string;
@@ -50,6 +50,12 @@ interface AuthResponse {
     email: string;
     role: {
       name: string;
+      permissions: [
+        {
+          actions: string[];
+          module: string;
+        }
+      ];
     };
   };
   message: string;
@@ -63,13 +69,15 @@ const authService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>("/auth/login", credentials);
     const {token, refreshToken, user} = response.data;
-
     const role = user?.role?.name;
-
+    const rolePermissions = user?.role?.permissions;
     localStorage.setItem(config.auth.tokenKey, token);
     localStorage.setItem(config.auth.refreshTokenKey, refreshToken);
     if (role) {
       localStorage.setItem(config.auth.role.name, role);
+    }
+    if (rolePermissions) {
+      localStorage.setItem("user_permission", JSON.stringify(rolePermissions));
     }
     return response.data;
   },
@@ -93,6 +101,7 @@ const authService = {
       localStorage.removeItem(config.auth.tokenKey);
       localStorage.removeItem(config.auth.refreshTokenKey);
       localStorage.removeItem(config.auth.role.name);
+      localStorage.removeItem("user_permission");
       window.location.href = "/login";
     }
   },
@@ -105,11 +114,10 @@ const authService = {
 
     const {token} = response.data;
     localStorage.setItem(config.auth.tokenKey, token);
-
     return response.data;
   },
 
-  async getCurrentUser(): Promise<ProfileData | null> {
+  async getCurrentUserinfo(): Promise<ProfileData | null> {
     const token = localStorage.getItem(config.auth.tokenKey);
     if (!token) return null;
 
@@ -131,20 +139,7 @@ const authService = {
       return null;
     }
   },
-  // async getUserlists(): Promise<AuthResponse["user"] | null> {
-  //   const token = localStorage.getItem(config.auth.tokenKey);
-  //   if (!token) return null;
-
-  //   try {
-  //     const response = await api.get<{userlists: User[]}>("/auth/userlists");
-  //     return response.data.userlists;
-  //   } catch (error) {
-  //     return null;
-  //   }
-  // },
   getUserlists: async (): Promise<AuthResponse["user"] | null> => {
-    // const token = localStorage.getItem(config.auth.tokenKey);
-    // if (!token) return null;
     try {
       const response = await api.get("/user/userlists"); // or whatever your route is
       return response.data.userlists; //
@@ -166,8 +161,8 @@ const authService = {
     const token = localStorage.getItem(config.auth.tokenKey);
     if (!token) return null;
     try {
-      const response = await api.get("/roles/"); // or whatever your route is
-      return response.data; //
+      const response = await api.get("/roles/");
+      return response.data;
     } catch (error) {
       return null;
     }
@@ -185,10 +180,8 @@ const authService = {
 
     try {
       const response = await api.get(`/user/${id}`);
-      console.log("response.data", response.data);
       return response.data;
     } catch (error) {
-      console.error("Failed to fetch user:", error);
       return null;
     }
   },
@@ -198,10 +191,8 @@ const authService = {
 
     try {
       const response = await api.put(`/user/update/${id}`, data);
-      console.log("response.data", response.data);
       return response.data;
     } catch (error) {
-      console.error("Failed to fetch user:", error);
       throw error;
     }
   },
@@ -211,10 +202,8 @@ const authService = {
 
     try {
       const response = await api.delete(`/user/delete/${id}`);
-      console.log("response.data", response.data);
       return response.data;
     } catch (error) {
-      console.error("Failed to fetch user:", error);
       throw error;
     }
   },
@@ -224,10 +213,8 @@ const authService = {
 
     try {
       const response = await api.put(`/profile/`, data);
-      console.log("response.data", response.data);
       return response.data;
     } catch (error) {
-      console.error("Failed to fetch user:", error);
       throw error;
     }
   },
@@ -236,7 +223,6 @@ const authService = {
       "/profile/change-password",
       data
     );
-
     return response.data;
   },
   async updateProfilePic(file: File): Promise<AuthResponse> {
@@ -250,7 +236,6 @@ const authService = {
           "Content-Type": "multipart/form-data",
         },
       });
-      console.log("response.data", response.data);
       return response.data;
     } catch (error) {
       console.error("Failed to update profile picture:", error);
@@ -259,9 +244,7 @@ const authService = {
   },
   isAuthenticated(): boolean {
     const token = localStorage.getItem(config.auth.tokenKey);
-    const refreshToken = localStorage.getItem(config.auth.refreshTokenKey);
-    console.log("isAuthenticated: token (auth_token) is", token ? "set" : "undefined");
-    console.log("isAuthenticated: refresh_token is", refreshToken ? "set" : "undefined");
+
     return !!token;
   },
   getRole(): string | null {
