@@ -37,16 +37,13 @@ const Login: React.FC = () => {
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    // alert();
     event.preventDefault();
     setError(null);
     setLoading(true);
-
     try {
       await authService.login(formData);
       navigate('/dashboard');
     } catch (err: any) {
-      console.log('err', err);
       setError(err.response?.data?.message || 'An error occurred during login please check username or password');
     } finally {
       setLoading(false);

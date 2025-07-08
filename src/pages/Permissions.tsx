@@ -64,7 +64,6 @@ const mockPermissions: Permission[] = [
 const PermissionCard: React.FC<{ permission: Permission }> = ({ permission }) => {
   const [checked, setChecked] = React.useState(permission.enabled);
   const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // console.log('>>>');
     setChecked(e.target.checked);
   };
   return (

@@ -55,15 +55,13 @@ const EditUser: React.FC = () => {
     const getRoleslist = async () => {
         try {
             const data = await authService.getRoleslists();
-            console.log(data);
             if (data && Array.isArray(data)) {
                 setRoles(data);
             } else {
-                console.warn("User list is empty or invalid:", data);
-                setRoles([]); // Set empty array to avoid breaking the table
+                setRoles([]);
             }
         } catch {
-            console.log("error");
+            throw new Error("Failed to fetch roles");
         }
     }
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
@@ -78,7 +76,6 @@ const EditUser: React.FC = () => {
         setLoading(true);
         const fetchUser = async () => {
             const CurrentUserdata = await authService.getUserById(id);
-            // console.log('CurrentUserdata>>>>', CurrentUserdata);
             if (CurrentUserdata) {
                 setUser({
                     firstName: CurrentUserdata.firstName,
@@ -99,11 +96,8 @@ const EditUser: React.FC = () => {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError(null);
-        console.log(userData);
         setLoading(true);
-
         try {
-            console.log('userData>', userData);
             if (id) {
                 const responseData = await authService.updateUserById(id, userData);
                 setSuccess(responseData.message);
@@ -115,7 +109,6 @@ const EditUser: React.FC = () => {
             setLoading(false);
         }
     };
-    // console.log('userData>>>', userData)
     return (
         <div>
             <Container component="main" maxWidth="xl">
