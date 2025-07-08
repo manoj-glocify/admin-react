@@ -32,49 +32,14 @@ interface Role {
   users: string[];
 }
 
-const mockRoles: Role[] = [
-  {
-    id: 1,
-    name: 'Administrator',
-    description: 'Full system access',
-    permissions: [{
-      module: 'users',
-      actions: ['users:manage', 'roles:manage', 'settings:manage'],
-    }],
-    users: ['5'],
-  },
-  {
-    id: 2,
-    name: 'Editor',
-    description: 'Content management access',
-    permissions: [{
-      module: 'users',
-      actions: ['content:create', 'content:edit', 'content:delete'],
-    }],
-    users: ['12'],
-  },
-  {
-    id: 3,
-    name: 'Viewer',
-    description: 'Read-only access',
-    permissions: [{
-      module: 'users',
-      actions: ['content:view'],
-    }],
-    users: ['25'],
-  },
-];
-
 const Roles: React.FC = () => {
   const confirm = useConfirm();
-  const [rolesList, setRoles] = React.useState<Role[]>(mockRoles);
+  const [rolesList, setRoles] = React.useState<Role[]>([]);
   const fetchRoles = async () => {
     try {
       const data = await authService.getAllRoleslists();
       if (data && Array.isArray(data)) {
         setRoles(data);
-      } else {
-        setRoles(mockRoles);
       }
     } catch {
       throw new Error("Failed to fetch roles");

@@ -23,13 +23,15 @@ const pages = {
           id: 'users',
           title: 'All Users',
           type: 'item',
-          url: '/users'
+          url: '/users',
+          permission: { module: 'users', action: 'read' }
         },
         {
           id: 'roles',
           title: 'Roles',
           type: 'item',
-          url: '/roles'
+          url: '/roles',
+          permission: { module: 'roles', action: 'read' }
         }
       ]
     }

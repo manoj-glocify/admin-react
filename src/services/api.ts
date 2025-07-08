@@ -22,6 +22,14 @@ api.interceptors.request.use(
   }
 );
 
+// Simple event emitter for error messages
+class ErrorEventEmitter {
+  listeners: ((msg: string) => void)[] = [];
+  emit(msg: string) { this.listeners.forEach(fn => fn(msg)); }
+  subscribe(fn: (msg: string) => void) { this.listeners.push(fn); return () => { this.listeners = this.listeners.filter(f => f !== fn); }; }
+}
+export const errorEventEmitter = new ErrorEventEmitter();
+
 // Response interceptor
 api.interceptors.response.use(
   (response) => response,
@@ -46,11 +54,30 @@ api.interceptors.response.use(
         }
         return api(originalRequest);
       } catch (error) {
-        // Handle refresh token failure
         localStorage.removeItem(config.auth.tokenKey);
         localStorage.removeItem(config.auth.refreshTokenKey);
         //  window.location.href = '/login';
         return Promise.reject(error);
+      }
+    }
+
+    // Global error handling
+    if (error.response) {
+      switch (error.response.status) {
+        case 400:
+          errorEventEmitter.emit('Something went wrong, please try after some time.');
+          break;
+        case 403:
+          errorEventEmitter.emit('Permission denied.');
+          break;
+        case 404:
+          errorEventEmitter.emit('Invalid API.');
+          break;
+        case 500:
+          errorEventEmitter.emit('Something went wrong, please try after some time.');
+          break;
+        default:
+          errorEventEmitter.emit('An unexpected error occurred.');
       }
     }
 

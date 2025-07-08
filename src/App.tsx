@@ -15,6 +15,8 @@ import AddUser from './pages/AddUser';
 import EditUser from './pages/EditUser';
 import authService from './services/auth';
 import ThemeCustomization from './theme';
+import { ErrorProvider } from './contexts/ErrorContext';
+import GlobalErrorAlert from './components/GlobalErrorAlert';
 
 
 // interface ProtectedRouteProps {
@@ -51,51 +53,54 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 function App() {
   return (
-    <ThemeCustomization>
-      <ConfirmProvider>
-        <Router>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route
-              path="/"
-              element={
-                authService.isAuthenticated()
-                  ? <Navigate to="/dashboard" replace />
-                  : <Navigate to="/login" replace />
-              }
-            />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <MainLayout />
-                </ProtectedRoute>
-              }>
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="users/add" element={<AddUser />} />
-              <Route path="users/edit/:id" element={<EditUser />} />
-              <Route path="users" element={<Users />} />
-              <Route path="roles" element={<Roles />} />
-              <Route path="permissions" element={<Permissions />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="settings" element={<Settings />} />
-            </Route>
-            {/* <Route
-              path="/"
-              element={
-                <RoleProtectedRoute allowedRoles={['user']}>
-                  <MainLayout />
-                </RoleProtectedRoute>
-              }>
-              <Route path="/" element={<Navigate to="/profile" replace />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/settings" element={<Settings />} />
-            </Route> */}
-          </Routes>
-        </Router>
-      </ConfirmProvider>
-    </ThemeCustomization>
+    <ErrorProvider>
+      <ThemeCustomization>
+        <ConfirmProvider>
+          <GlobalErrorAlert />
+          <Router>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route
+                path="/"
+                element={
+                  authService.isAuthenticated()
+                    ? <Navigate to="/dashboard" replace />
+                    : <Navigate to="/login" replace />
+                }
+              />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout />
+                  </ProtectedRoute>
+                }>
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="users/add" element={<AddUser />} />
+                <Route path="users/edit/:id" element={<EditUser />} />
+                <Route path="users" element={<Users />} />
+                <Route path="roles" element={<Roles />} />
+                <Route path="permissions" element={<Permissions />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
+              {/* <Route
+                path="/"
+                element={
+                  <RoleProtectedRoute allowedRoles={['user']}>
+                    <MainLayout />
+                  </RoleProtectedRoute>
+                }>
+                <Route path="/" element={<Navigate to="/profile" replace />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/settings" element={<Settings />} />
+              </Route> */}
+            </Routes>
+          </Router>
+        </ConfirmProvider>
+      </ThemeCustomization>
+    </ErrorProvider>
   );
 }
 

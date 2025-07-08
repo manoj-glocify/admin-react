@@ -8,6 +8,7 @@ import Box from '@mui/material/Box';
 import NavItem from './NavItem';
 import NavGroup from './NavGroup';
 import menuItems from '../../../menu-items';
+import { hasPermission } from '../../../config/utils';
 
 import { useGetMenuMaster } from '../../../api/menu';
 
@@ -38,7 +39,26 @@ function MenuList() {
     }));
   }
 
-  const navItems = menuItems.items.slice(0, lastItemIndex + 1).map((item, index) => {
+  // Recursive function to filter items by permission
+  const filterMenuItems = (items) => {
+    return items
+      .filter((item) => {
+        if (item.permission) {
+          return hasPermission(item.permission.module, item.permission.action);
+        }
+        return true;
+      })
+      .map((item) => {
+        if (item.children) {
+          return { ...item, children: filterMenuItems(item.children) };
+        }
+        return item;
+      });
+  };
+
+  const filteredMenuItems = filterMenuItems(menuItems.items.slice(0, lastItemIndex + 1));
+
+  const navItems = filteredMenuItems.map((item, index) => {
     switch (item.type) {
       case 'group':
         if (item.url && item.id !== lastItemId) {
