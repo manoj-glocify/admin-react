@@ -17,7 +17,6 @@ import authService from './services/auth';
 import ThemeCustomization from './theme';
 
 
-<<<<<<< HEAD
 // interface ProtectedRouteProps {
 //   children: React.ReactNode;
 // }
@@ -42,18 +41,6 @@ const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({ allowedRoles, c
   }
   return <>{children}</>;
 };
-=======
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-  },
-});
->>>>>>> main
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   if (!authService.isAuthenticated()) {
@@ -94,7 +81,6 @@ function App() {
               <Route path="profile" element={<Profile />} />
               <Route path="settings" element={<Settings />} />
             </Route>
-<<<<<<< HEAD
             {/* <Route
               path="/"
               element={
@@ -106,8 +92,6 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/settings" element={<Settings />} />
             </Route> */}
-=======
->>>>>>> main
           </Routes>
         </Router>
       </ConfirmProvider>
