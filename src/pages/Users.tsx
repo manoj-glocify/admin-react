@@ -39,54 +39,9 @@ interface User {
   }
 }
 
-const mockUsers: User[] = [
-  {
-    createdAt: '',
-    id: "1",
-    firstName: 'John Doe',
-    email: 'john@example.com',
-    googleId: '',
-    lastName: '',
-    roleId: 'Admin',
-    isActive: true,
-    updatedAt: '',
-    role: {
-      name: 'Admin',
-    },
-  },
-  {
-    createdAt: '',
-    id: "2",
-    firstName: 'Jane Smith',
-    email: 'jane@example.com',
-    googleId: '',
-    lastName: '',
-    roleId: 'User',
-    isActive: true,
-    updatedAt: '',
-    role: {
-      name: 'User',
-    },
-  },
-  {
-    createdAt: '',
-    id: "3",
-    firstName: 'Bob Johnson',
-    email: 'bob@example.com',
-    googleId: '',
-    lastName: '',
-    roleId: 'Editor',
-    isActive: true,
-    updatedAt: '',
-    role: {
-      name: 'User',
-    }
-  },
-];
-
 const Users: React.FC = () => {
   const navigate = useNavigate();
-  const [listusers, setUsers] = React.useState<User[]>(mockUsers);
+  const [listusers, setUsers] = React.useState<User[]>([]);
   const [open, setOpen] = React.useState(false);
   const confirm = useConfirm();
   const getUserslist = async () => {
@@ -94,9 +49,7 @@ const Users: React.FC = () => {
       const data = await authService.getUserlists();
       if (data && Array.isArray(data)) {
         setUsers(data);
-      } else {
-        setUsers([]);
-      }
+      } 
     } catch {
       throw new Error("Failed to fetch users");
     }
