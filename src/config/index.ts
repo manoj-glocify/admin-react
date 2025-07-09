@@ -29,7 +29,7 @@ interface Config {
 
 const config: Config = {
   api: {
-    url: process.env.REACT_APP_API_URL || "http://localhost:3000/api",
+    url: process.env.REACT_APP_API_URL || "http://localhost:3002/api",
     version: process.env.REACT_APP_API_VERSION || "v1",
   },
   auth: {
